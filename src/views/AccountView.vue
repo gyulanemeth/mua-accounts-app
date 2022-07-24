@@ -21,7 +21,7 @@ async function loadData () {
   } else {
     if (store.account === null) {
       useSystemMessagesStore().addError({ status: 404, name: 'NOT_FOUND', message: 'Account data not found please login' })
-      return router.push('/login')
+      return router.push('/')
     }
     formData.value = await store.account
   }

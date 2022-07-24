@@ -5,8 +5,10 @@ import { useRouter } from 'vue-router'
 import UsersList from '../components/UsersList.vue'
 import stores from '../stores/index.js'
 import useSystemMessagesStore from '../stores/systemMessages.js'
+import alerts from '../alerts/alert.js'
 
 const router = useRouter()
+const alert = alerts()
 
 const data = ref()
 const roles = ref()
@@ -17,7 +19,7 @@ async function loadData () {
   store = stores().usersStore()
   if (currentAccountStore.account === null) {
     useSystemMessagesStore().addError({ status: 404, name: 'NOT_FOUND', message: 'Account Id not found please login' })
-    return router.push('/login')
+    return router.push('/')
   }
   store.params = { accountId: currentAccountStore.account._id }
   await store.load()
@@ -27,10 +29,14 @@ async function loadData () {
 }
 
 async function eventHandler (data) {
-  if (data.operation === 'delete') {
-    store.deleteOne(data.id)
-  } else if (data.operation === 'updateRole') {
+  if (data.operation === 'updateRole') {
     store.patchRole(data.id, { role: data.role })
+  }
+    if (data.operation === 'delete') {
+      const confirm = await alert.confirmAlert(`do you want to Delete the record?`)
+      if (confirm.isConfirmed) {
+      store.deleteOne(data.id)
+    }
   }
 }
 

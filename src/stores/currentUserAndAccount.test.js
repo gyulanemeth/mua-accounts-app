@@ -47,6 +47,15 @@ describe('Current User And Account Store', () => {
       return { success: true }
     }
 
+    const mockCreateOne = async function (formData) {
+      if (!formData || !formData.account || !formData.account.name || !formData.account.urlFriendlyName) {
+        throw new RouteError('Account Name And UrlFriendlyName Is Required')
+      } else if (!formData.user || !formData.user.name || !formData.user.email || !formData.user.password) {
+        throw new RouteError('User Name, Email And Password Is Required')
+      }
+      return { success: true }
+    }
+
     const mockReset = async function (formData) {
       if (formData === undefined || formData.id === undefined || formData.token === undefined || formData.newPassword === undefined || formData.newPasswordAgain === undefined) {
         throw new RouteError('User Password Is Required')
@@ -130,7 +139,7 @@ describe('Current User And Account Store', () => {
     }
 
     return {
-      account: { patchName: mockPatchAccountName, patchUrlFriendlyName: mockPatchAccountUrlFriendlyName, readOne: mockAccountReadOne },
+      account: { patchName: mockPatchAccountName, patchUrlFriendlyName: mockPatchAccountUrlFriendlyName, createOne: mockCreateOne, readOne: mockAccountReadOne },
       invitation: { send: mockSendInvitation, accept: mockAccept },
       forgotPassword: { send: mockSendForgetPasssword, reset: mockReset },
       user: { patchName: mockPatchUserName, patchPassword: mockPatchPassword, getAccessToken: mockgetAccessToken, login: mockLogin, loginGetAccounts: mockLoginGetAccounts, readOne: mockUserReadOne }
@@ -245,6 +254,20 @@ describe('Current User And Account Store', () => {
     store.account = { _id: '12test12' }
     const res = await store.sendInvitation('user1@gmail.com')
     expect(res).toEqual('success')
+  })
+
+  test('test success createOne', async () => {
+    const currentUser = useCurrentUserAndAccountStore(mokeConnector())
+    const store = currentUser()
+    const res = await store.createAccount({ user: { name: 'test', email: 'email@123.com', password: 'testPass' }, account: { name: 'testName', urlFriendlyName: 'testurlFriendlyName' } })
+    expect(res).toEqual('success')
+  })
+
+  test('test error createOne', async () => {
+    const currentUser = useCurrentUserAndAccountStore(mokeConnector())
+    const store = currentUser()
+    const res = await store.createAccount()
+    expect(res.message).toEqual('Account Name And UrlFriendlyName Is Required')
   })
 
   test('test send admin Invitation undefined account id error', async () => {

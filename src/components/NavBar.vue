@@ -48,7 +48,7 @@ const menuItems = [
     <v-btn
 
       variant="text"
-      to="/login"
+      to="/"
     >
       Login
     </v-btn>

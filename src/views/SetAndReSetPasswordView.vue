@@ -19,12 +19,12 @@ async function loadData () {
   }
 }
 
-async function eventHandler (token, newPassword, newPasswordAgain) {
+async function eventHandler (data) {
   let res
   if (formData.value.text === 'Reset Password') {
-    res = await store.resetForgotPassword(token, newPassword, newPasswordAgain)
+    res = await store.resetForgotPassword(data.token, data.newPassword, data.newPasswordAgain)
   } else if (formData.value.text === 'Set Password') {
-    res = await store.acceptInvitation(token, newPassword, newPasswordAgain)
+    res = await store.acceptInvitation(data.token, data.newPassword, data.newPasswordAgain, data.name)
   }
   if (res === 'success') {
     router.push('/me')

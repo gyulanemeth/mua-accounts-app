@@ -9,12 +9,16 @@ const props = defineProps({
 
 const filter = ref('')
 const radioGroup = ref(false)
-const show = ref(false)
+const newName = ref('')
+const editemood = ref(false)
 
-function expande (id) {
-  radioGroup.value = false
-  show.value = show.value === id ? false : id
+
+function edite (id) {
+  newName.value = ''
+  radioGroup.value = ''
+  editemood.value = editemood.value === id ? false : id
 }
+
 
 </script>
 
@@ -25,8 +29,8 @@ function expande (id) {
 
   <v-text-field class="my-2 ml-4"
   variant="outlined"
-  label="Prepend inner"
-   prepend-icon="mdi-magnify"
+  label="Search"
+  prepend-inner-icon="mdi-magnify"
   v-model.lazy="filter"
     color="primary"
   @change="$emit('searchEvent',filter)"
@@ -49,47 +53,59 @@ function expande (id) {
           cover
         ></v-img>
         <v-card-title>
-        {{item.data.name}}
+        <input
+          :value="item.data.name"
+          :label="item.data.name"
+          disabled
+        />
         <v-card-subtitle>
           - {{item.status}}
         </v-card-subtitle >
       </v-card-title>
-        <v-card-actions>
-          <v-btn
-            color="red-lighten-2"
-            variant="text"
-            @click="$emit('buttonEvent',{id:item._id,operation: 'delete'})"
-          >
-            Delete
-          </v-btn>
-          <v-spacer></v-spacer>
-                <v-btn
-                  :icon="show === item._id? 'mdi-chevron-up' : 'mdi-chevron-down'"
-                  @click="expande(item._id)"
-                ></v-btn>
-              </v-card-actions>
-              <v-expand-transition v-if="show === item._id">
-                <div >
-                  <v-divider></v-divider>
-                  <v-radio-group inline v-model="radioGroup">
-                    <v-radio
-                    v-for="data in props.roles"
-                    :key="data+item._id"
-                    :disabled = "item.data.role === data"
-                    :label="data"
-                    :value="data"
-                    ></v-radio>
-                  </v-radio-group>
 
-                  <v-btn
-                  color="primary"
-                  variant="text"
-                  @click="radioGroup && $emit('buttonEvent',{id: item._id, role: radioGroup, operation: 'updateRole'})"
-                  >
-                  Change Role
-                </v-btn>
-                </div>
-              </v-expand-transition>
+              <v-card-actions v-if='editemood === item._id'>
+                <v-radio-group inline v-model="radioGroup">
+                  <v-radio
+                  v-for="data in props.roles"
+                  :key="data+item._id"
+                  :disabled = "item.data.role === data"
+                  :label="data"
+                  :value="data"
+                  ></v-radio>
+                </v-radio-group>
+
+                      <v-divider />
+                    <v-btn
+                    color="primary"
+                    variant="outlined"
+                    icon="mdi-check"
+                    size="small"
+                    @click.stop="$emit('buttonEvent',{id: item._id, name:newName ,role: radioGroup, operation: 'updateRole'}); edite(item._id)" />
+
+                    <v-btn
+                      class="ml-2"
+                      color="red"
+                      variant="outlined"
+                      icon="mdi-window-close"
+                      size="small" @click="edite(item._id)" />
+                  </v-card-actions>
+                    <v-card-actions v-else>
+                      <v-btn
+                        color="primary"
+                        variant="text"
+                        @click.stop="edite(item._id)"
+                      >
+                        Update
+                      </v-btn>
+                      <v-btn
+                        color="red-lighten-2"
+                        variant="text"
+                        @click="$emit('buttonEvent',{id:item._id,operation: 'delete'})"
+                      >
+                        Delete
+                      </v-btn>
+                    </v-card-actions>
+
       </v-card>
 </v-layout>
 </v-container>

@@ -221,40 +221,6 @@ describe('test accounts connectors', () => {
     await expect(accounts(fetch, apiUrl).account.patchUrlFriendlyName({ id: '123' })).rejects.toThrowError('Account ID And New urlFriendlyName Is Required')
   })
 
-  test('test admin createOne account', async () => {
-    const fetch = vi.fn()
-    fetch.mockResolvedValue({
-      ok: true,
-      headers: { get: () => 'application/json' },
-      json: () => Promise.resolve({ result: { success: true } })
-    })
-
-    const spy = vi.spyOn(fetch, 'impl')
-    const res = await accounts(fetch, apiUrl).account.adminCreateOne({ name: 'AccountName', urlFriendlyName: 'updateUrlFriendlyName' })
-
-    expect(spy).toHaveBeenLastCalledWith(
-      'https:/mua/accounts/v1/accounts',
-      {
-        method: 'POST',
-        body: JSON.stringify({ name: 'AccountName', urlFriendlyName: 'updateUrlFriendlyName' }),
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: 'Bearer ' + localStorage.getItem('accessToken')
-        }
-      })
-    expect(res).toEqual({ success: true })
-  })
-
-  test('test createOne with undefined input ', async () => {
-    const fetch = vi.fn()
-    fetch.mockResolvedValue({
-      ok: true,
-      headers: { get: () => 'application/json' },
-      json: () => Promise.resolve({ result: { success: true } })
-    })
-    await expect(accounts(fetch, apiUrl).account.adminCreateOne()).rejects.toThrowError('FormData Name And UrlFriendlyName Is Required')
-  })
-
   test('test createOne account', async () => {
     const fetch = vi.fn()
     fetch.mockResolvedValue({

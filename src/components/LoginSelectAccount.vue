@@ -1,11 +1,13 @@
 <script setup >
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 
 import stores from '../stores/index.js'
 
 const Store = stores().currentUserAndAccountStore()
+const route = useRoute()
 const router = useRouter()
+
 const props = defineProps({
   data: Object,
   token: String
@@ -19,6 +21,10 @@ async function submit () {
   if (res === 'success') {
     router.push('/me')
   }
+}
+
+function redirect(){
+  router.push(`/forgot-password?accountId=${account.value._id}`)
 }
 
 </script>
@@ -46,7 +52,7 @@ async function submit () {
             </v-col>
             <v-row>
             <v-col>
-                <v-list-item class="d-flex flex-row mb-1 ml-4" title=" Forget password? Reset Password" to="/forgot-password"></v-list-item>
+                <v-list-item class="d-flex flex-row mb-1 ml-4" title=" Forget password? Reset Password" @click="redirect"></v-list-item>
               <v-btn color="primary" @click="submit" >Sign In</v-btn>
             </v-col>
           </v-row>

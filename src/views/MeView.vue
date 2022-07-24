@@ -20,7 +20,7 @@ async function loadData () {
   } else {
     if (store.user === null) {
       useSystemMessagesStore().addError({ status: 404, name: 'NOT_FOUND', message: 'User data not found please login' })
-      return router.push('/login')
+      return router.push('/')
     }
     formData.value = await store.user
   }
