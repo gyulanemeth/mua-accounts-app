@@ -8,8 +8,9 @@ import FinalizeRegistrationView from '../views/FinalizeRegistrationView.vue'
 import CreateAccountView from '../views/CreateAccountView.vue'
 import LoginAndResetView from '../views/LoginAndResetView.vue'
 import RedirectToLoginMessage from '../views/RedirectToLoginMessage.vue'
-import { useCurrentUserAndAccountStore } from '../stores/index.js'
+import { useCurrentUserAndAccountStore, useUsersStore } from '../stores/index.js'
 import NotFoundView from '../views/NotFoundView.vue'
+import useSystemMessagesStore from '../stores/systemMessages.js'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -21,6 +22,37 @@ const router = createRouter({
       meta: {
         requiresAuth: true,
         header: 'users'
+      },
+      beforeEnter: async (to, from, next) => {
+        const currentUserAndAccountStore = useCurrentUserAndAccountStore()
+        const store = useUsersStore()
+        if (!currentUserAndAccountStore.user.role) {
+          await currentUserAndAccountStore.readOneUser()
+          if (!currentUserAndAccountStore.user.role) {
+            useSystemMessagesStore().addError({
+              status: 404,
+              name: 'NOT_FOUND',
+              message: 'User Id not found please login'
+            })
+            next({ path: '/' })
+          }
+        }
+        if (!currentUserAndAccountStore.account || !currentUserAndAccountStore.account.name) {
+          await currentUserAndAccountStore.readOne()
+          if (!currentUserAndAccountStore.account.name) {
+            useSystemMessagesStore().addError({
+              status: 404,
+              name: 'NOT_FOUND',
+              message: 'Account Id not found please login'
+            })
+            next({ path: '/' })
+          }
+        }
+        store.params = {
+          accountId: currentUserAndAccountStore.account._id
+        }
+        await store.load()
+        next()
       }
     },
     {
@@ -122,6 +154,24 @@ const router = createRouter({
       meta: {
         requiresAuth: true,
         header: 'account'
+      },
+      beforeEnter: async (to, from, next) => {
+        const store = useCurrentUserAndAccountStore()
+        if (!store.user || !store.user.role) {
+          store.readOneUser()
+        }
+        if (!store.account || !store.account.name) {
+          await store.readOne()
+          if (!store.account) {
+            useSystemMessagesStore().addError({
+              status: 404,
+              name: 'NOT_FOUND',
+              message: 'Account data not found please login'
+            })
+            next({ path: '/' })
+          }
+        }
+        next()
       }
     },
     {
